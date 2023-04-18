@@ -5,7 +5,7 @@ import asyncio
 
 client = discord.Client()
 
-# file name with QOTD
+
 FILE_NAME = "questions.txt"
 
 questions = []
@@ -25,16 +25,16 @@ async def on_message(message):
         if len(questions) == 0:
             await message.channel.send("There are no QOTD avaleble")
         else:
-            # Kies een willekeurige vraag uit de lijst van vragen
+            
             question = random.choice(questions)
-            # Verwijder de vraag uit de lijst van vragen
+           
             questions.remove(question)
-            # Voeg de vraag toe aan de lijst van gestelde vragen
+          
             asked_questions.append(question)
-            # Als alle vragen gesteld zijn, herlaad de lijst van vragen
+          
             if len(questions) == 0:
                 load_questions()
-            # Stuur de vraag in een embed
+          
             embed = discord.Embed(title="Vraag van de dag", description=question, color=0x00ff00)
             await message.channel.send(embed=embed)
 
@@ -54,7 +54,7 @@ def remove_asked_questions():
             if line.strip() not in asked_questions:
                 f.write(line)
 
-#
+
 async def post_question():
     await client.wait_until_ready()
     channel = client.get_channel(CHANNLE_ID)  # Vervang CHANNEL_ID door het ID van het kanaal waarin de vraag moet worden gesteld
