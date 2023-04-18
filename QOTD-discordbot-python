@@ -1,0 +1,82 @@
+import discord
+import random
+import asyncio
+
+
+client = discord.Client()
+
+# file name with QOTD
+FILE_NAME = "questions.txt"
+
+
+questions = []
+
+
+asked_questions = []
+
+
+@client.event
+async def on_ready():
+    print('Bot is ready!')
+
+
+@client.event
+async def on_message(message):
+    if message.content.startswith('!qotd'):
+        if len(questions) == 0:
+            await message.channel.send("There are no QOTD avaleble")
+        else:
+            # Kies een willekeurige vraag uit de lijst van vragen
+            question = random.choice(questions)
+            # Verwijder de vraag uit de lijst van vragen
+            questions.remove(question)
+            # Voeg de vraag toe aan de lijst van gestelde vragen
+            asked_questions.append(question)
+            # Als alle vragen gesteld zijn, herlaad de lijst van vragen
+            if len(questions) == 0:
+                load_questions()
+            # Stuur de vraag in een embed
+            embed = discord.Embed(title="Vraag van de dag", description=question, color=0x00ff00)
+            await message.channel.send(embed=embed)
+
+
+def load_questions():
+    global questions
+    with open(FILE_NAME, 'r') as f:
+        questions = [line.strip() for line in f.readlines()]
+
+
+def remove_asked_questions():
+    global asked_questions
+    with open(FILE_NAME, 'r') as f:
+        lines = f.readlines()
+    with open(FILE_NAME, 'w') as f:
+        for line in lines:
+            if line.strip() not in asked_questions:
+                f.write(line)
+
+#
+async def post_question():
+    await client.wait_until_ready()
+    channel = client.get_channel(CHANNLE_ID)  # Vervang CHANNEL_ID door het ID van het kanaal waarin de vraag moet worden gesteld
+    while not client.is_closed():
+        if len(questions) == 0:
+            load_questions()
+        if len(questions) > 0:
+            
+            question = random.choice(questions)
+            
+            questions.remove(question)
+            
+            asked_questions.append(question)
+            
+            if len(questions) == 0:
+                load_questions()
+            
+            embed = discord.Embed(title="Vraag van de dag", description=question, color=0x00ff00)
+            await channel.send(embed=embed)
+        remove_asked_questions()
+        await asyncio.sleep(86400)  # 86400 seconden = 24 uur
+
+client.loop.create_task(post_question())
+client.run('Your Token')
